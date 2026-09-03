@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BookController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::get('/login', [AuthController::class, 'showLoginForm'])->middleware('guest')->name('login');
 Route::post('/login', [AuthController::class, 'authenticate']);
-Route::get('/', [DashboardController::class, 'showDashboard'])->name('dashboard');
+Route::get('/home', [BookController::class, 'index'])->middleware('auth')->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/books/{book}/read', [BookController::class, 'show'])->name('book.read');
+    Route::get('/books/{book}/page/{pageNumber}', [BookController::class, 'servePage'])
+        ->name('book.page');
+});

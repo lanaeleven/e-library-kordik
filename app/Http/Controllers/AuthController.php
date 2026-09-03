@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +16,13 @@ class AuthController extends Controller
             'username' => ['required'],
             'password' => ['required'],
         ]);
- 
+
+        $user = User::where('username', $credentials['username'])->first();
+        
+        if (!$user) {
+            return back()->with('failed', 'Username atau Password tidak sesuai');
+        }
+
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
  
