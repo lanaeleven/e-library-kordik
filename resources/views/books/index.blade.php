@@ -9,7 +9,7 @@
                             class="card-img-top" alt="{{ $book->title }}">
                         <div class="card-body p-2">
                             <h6 class="card-title mb-1" style="font-size: 0.9rem;">{{ $book->title }}</h6>
-                            <a href="{{ route('book.read', $book->id) }}" class="btn btn-sm btn-primary w-100">Baca</a>
+                            <a href="{{ route('book.detail', $book->id) }}" class="btn btn-sm btn-primary w-100">Lihat Detail</a>
                         </div>
                     </div>
                 </div>

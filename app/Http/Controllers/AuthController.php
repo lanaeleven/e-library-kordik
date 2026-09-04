@@ -36,4 +36,10 @@ class AuthController extends Controller
         $pageTitle = 'Login';
         return view('auth.login', compact('pageTitle'));
     }
+
+    public function logout()
+    {
+        Auth::logout();
+        return redirect('login');
+    }
 }
