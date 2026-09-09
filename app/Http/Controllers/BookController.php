@@ -8,9 +8,10 @@ use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $books = Book::all();
+        $search = $request->search;
+        $books = Book::where('title', 'LIKE', "%$search%")->orWhere('author', 'LIKE', "%$search%")->get();
         $pageTitle = 'Home';
 
         return view('books.index', compact('pageTitle', 'books'));
