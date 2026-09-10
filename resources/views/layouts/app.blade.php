@@ -16,9 +16,12 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('dashboard') }}">
-                <i class="bi bi-book-half"></i> RSISA Library
-            </a>
+            <div class="d-flex">
+                <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('dashboard') }}">
+                    <i class="bi bi-book-half"></i> RSISA Library
+                </a>
+                <a class="btn btn-secondary" href="{{ route('book.myBook') }}">Buku Saya</a>
+            </div>
 
             @auth
                 <div class="d-flex align-items-center gap-3 ms-auto">

@@ -27,14 +27,16 @@
                             <li><i class="bi bi-person"></i> {{ $book->author }}</li>
                         @endif
                         @if ($book->category ?? false)
-                            <li><i class="bi bi-tag"></i> {{ $book->category }}</li>
+                            <li><i class="bi bi-tag"></i> {{ \App\Enums\Category::name($book->category) }}</li>
                         @endif
+                        @if (!$loan)
                         <li>
                             <i class="bi bi-stack"></i> Stok:
                             <span class="badge {{ $bookStock > 0 ? 'bg-success' : 'bg-danger' }}">
                                 {{ $bookStock > 0 ? $bookStock . ' tersedia' : 'Habis' }}
                             </span>
                         </li>
+                        @endif
                     </ul>
 
                     @if ($book->description ?? false)
@@ -48,14 +50,14 @@
                             <i class="bi bi-clock-history fs-4"></i>
                             <div>
                                 <strong>Sedang kamu pinjam</strong><br>
-                                <small>Sisa waktu baca: {{ now()->diffForHumans($loan->expires_at, true) }} lagi</small>
+                                <small>Sisa waktu baca: {{ now()->diffInDays($loan->expires_at, true) }} hari lagi</small>
                             </div>
                         </div>
                         <a href="{{ route('book.read', $book->id) }}" class="btn btn-primary btn-lg">
                             <i class="bi bi-book"></i> Baca Sekarang
                         </a>
                     @else
-                        @if ($bookStock > 0)
+                        @if ($bookStock > 0 && $canBorrow)
                             <p class="text-muted small">Masa pinjam berlaku 14 hari sejak buku dipinjam.</p>
                             <form action="{{ route('book.borrow', $book->id) }}" method="POST">
                                 @csrf
@@ -63,9 +65,13 @@
                                     <i class="bi bi-bookmark-plus"></i> Pinjam Buku
                                 </button>
                             </form>
-                        @else
+                        @elseif ($bookStock < 1)
                             <button class="btn btn-secondary btn-lg" disabled>
                                 <i class="bi bi-x-circle"></i> Stok Habis
+                            </button>
+                        @elseif (!$canBorrow)
+                            <button class="btn btn-secondary btn-lg" disabled>
+                                <i class="bi bi-x-circle"></i> Kuota Peminjaman Habis
                             </button>
                         @endif
                     @endif

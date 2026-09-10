@@ -4,15 +4,8 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="d-flex">
-            <h3 class="mb-0"><i class="bi bi-collection"></i> Koleksi Buku</h3>
-            <a class="btn btn-success btn-sm ms-2" href="{{ route('book.create') }}">Tambah buku</a>
+            <h3 class="mb-0"><i class="bi bi-collection"></i>Buku Saya</h3>
         </div>
-        <form action="/" method="get">
-            <div class="d-flex">
-                <input type="text" class="form-control" name="search" id="search" value="{{  request('search')  }}" placeholder="find by title or author">
-                <button type="submit" class="btn btn-sm btn-secondary ms-2"><i class="bi bi-search"></i></button>
-            </div>
-        </form>
     </div>
 
     <div class="row g-3">
@@ -33,7 +26,7 @@
             </div>
         @empty
             <div class="col-12">
-                <div class="alert alert-secondary text-center">Belum ada buku tersedia.</div>
+                <div class="alert alert-secondary text-center">Belum ada buku yang dipinjam.</div>
             </div>
         @endforelse
     </div>

@@ -26,6 +26,9 @@ Route::get('/', [BookController::class, 'index'])->middleware('auth')->name('das
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/books/my-book', [BookController::class, 'myBook'])->name('book.myBook');
+    Route::post('/books/store', [BookController::class, 'store'])->name('book.store');
+    Route::get('/books/create', [BookController::class, 'create'])->name('book.create');
     Route::post('/books/borrow/{book}', [BookController::class, 'borrow'])->name('book.borrow');
     Route::get('/books/{book}', [BookController::class, 'detail'])->name('book.detail');
     Route::get('/books/{book}/read', [BookController::class, 'show'])->name('book.read');

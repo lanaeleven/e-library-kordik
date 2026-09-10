@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Book;
 use App\Checkout;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
 {
@@ -16,6 +17,36 @@ class BookController extends Controller
 
         return view('books.index', compact('pageTitle', 'books'));
     }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'title' => 'required',
+            'author' => 'required',
+            'category' => 'required',
+            'totalPages' => 'required',
+            'bookFile' => 'required|mimes:pdf'
+        ]);
+        $pageTitle = 'Home';
+
+        return view('books.index', compact('pageTitle', 'books'));
+    }
+
+    public function myBook()
+    {
+        $userId = auth()->id();
+        $books = DB::table('books')
+                    ->join('checkouts', 'books.id', '=', 'checkouts.book_id')
+                    ->select('books.*')
+                    ->where('checkouts.user_id', '=', $userId)
+                    ->whereNull('return_at')
+                    ->where('expires_at', '>', now())
+                    ->get();
+        $pageTitle = 'My Book';
+
+        return view('books.my-book', compact('pageTitle', 'books'));
+    }
+
     public function show(Book $book)
     {
         abort_unless($this->userCanRead($book), 403);
@@ -50,6 +81,7 @@ class BookController extends Controller
 
     public function detail(Book $book)
     {
+        $userId = auth()->id();
         $loan = null;
         $bookStock = null;
         $routeBack = route('dashboard');
@@ -62,7 +94,15 @@ class BookController extends Controller
                 ->count();
         }
 
-        return view('books.detail', compact('book', 'loan', 'bookStock', 'routeBack'));
+        $booksBorrowedTotal = DB::table('books')
+                    ->join('checkouts', 'books.id', '=', 'checkouts.book_id')
+                    ->where('checkouts.user_id', '=', $userId)
+                    ->whereNull('return_at')
+                    ->where('expires_at', '>', now())
+                    ->count();
+        $canBorrow = $booksBorrowedTotal < 2;
+
+        return view('books.detail', compact('book', 'loan', 'bookStock', 'routeBack', 'canBorrow'));
     }
 
     public function borrow(Book $book)
@@ -92,5 +132,11 @@ class BookController extends Controller
                 ->whereNull('return_at')
                 ->where('expires_at', '>', now())
                 ->first();
+    }
+
+    public function create()
+    {
+        $pageTitle = 'Add Book';
+        return view('books.create', compact('pageTitle'));
     }
 }
