@@ -6,9 +6,11 @@ use App\Book;
 use App\Checkout;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class BookController extends Controller
 {
+
     public function index(Request $request)
     {
         $search = $request->search;
@@ -21,15 +23,29 @@ class BookController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required',
+            'title' => 'required|unique:books,title',
             'author' => 'required',
             'category' => 'required',
             'totalPages' => 'required',
             'bookFile' => 'required|mimes:pdf'
         ]);
-        $pageTitle = 'Home';
 
-        return view('books.index', compact('pageTitle', 'books'));
+        $slugName = Str::slug($request->input('title'));
+        $folderName = 'books/' . $slugName;
+        $fileName = $slugName . '.' . 'pdf';
+        $filePath = $request->file('bookFile')->storeAs($folderName, $fileName, 'private');
+        
+
+        Book::create([
+            'title' => $request->input('title'),
+            'author' => $request->input('author'),
+            'category' => $request->input('category'),
+            'total_pages' => $request->input('totalPages'),
+            'file_path' => $filePath,
+        ]);
+        
+
+        return redirect(route('dashboard'));
     }
 
     public function myBook()
@@ -62,7 +78,8 @@ class BookController extends Controller
         }
 
         $paddedNumber = str_pad($pageNumber, 3, '0', STR_PAD_LEFT);
-        $path = storage_path("app/private/books/{$book->folder}/page_{$paddedNumber}.jpg");
+        $folderPath = dirname($book->file_path);
+        $path = storage_path("app/private/{$folderPath}/page_{$paddedNumber}.jpg");
 
         abort_unless(file_exists($path), 404);
 

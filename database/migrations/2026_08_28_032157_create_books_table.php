@@ -18,8 +18,7 @@ class CreateBooksTable extends Migration
             $table->string('title');
             $table->string('author');
             $table->tinyInteger('category');
-            $table->string('fileName');
-            $table->string('filePath');
+            $table->string('file_path');
             $table->integer('total_pages');
             $table->timestamps();
         });
