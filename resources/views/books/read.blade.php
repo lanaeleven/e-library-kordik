@@ -2,11 +2,17 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="text-center mb-3">
-        <h5 class="mb-3">{{ $book->title }}</h5>
+    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+        <a href="{{ route('book.detail', $book->id) }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Kembali
+        </a>
+        <h5 class="mb-0 text-center flex-grow-1">{{ $book->title }}</h5>
+        <div style="width: 90px;"></div> {{-- spacer biar judul tetap center --}}
+    </div>
 
+    <div class="text-center mb-3">
         <div class="d-inline-flex align-items-center gap-2 bg-white shadow-sm rounded-pill px-3 py-2 mb-2">
-            <button onclick="prevPage()" class="btn btn-sm btn-outline-secondary rounded-circle">
+            <button id="btnPrev" onclick="prevPage()" class="btn btn-sm btn-outline-secondary rounded-circle">
                 <i class="bi bi-chevron-left"></i>
             </button>
 
@@ -18,7 +24,7 @@
 
             <button onclick="jumpToPage()" class="btn btn-sm btn-primary">Go</button>
 
-            <button onclick="nextPage()" class="btn btn-sm btn-outline-secondary rounded-circle">
+            <button id="btnNext" onclick="nextPage()" class="btn btn-sm btn-outline-secondary rounded-circle">
                 <i class="bi bi-chevron-right"></i>
             </button>
         </div>
@@ -38,7 +44,10 @@
     </div>
 
     <div class="d-flex justify-content-center">
-        <div class="bg-white shadow rounded" style="overflow: auto; max-height: 78vh; max-width: 100%;">
+        <div class="bg-white shadow rounded position-relative" style="overflow: auto; max-height: 78vh; max-width: 100%;">
+            <div id="loadingSpinner" class="position-absolute top-50 start-50 translate-middle">
+                <div class="spinner-border text-secondary" role="status"></div>
+            </div>
             <canvas id="pdfCanvas" class="d-block mx-auto"></canvas>
         </div>
     </div>
@@ -50,6 +59,11 @@
     let currentPage = 1;
     let scale = 1;
     let currentImage = null;
+
+    function updateNavButtons() {
+        document.getElementById('btnPrev').disabled = currentPage <= 1;
+        document.getElementById('btnNext').disabled = currentPage >= totalPages;
+    }
 
     function drawCanvas() {
         if (!currentImage) return;
@@ -63,13 +77,22 @@
     }
 
     function renderPage(pageNumber) {
+        const spinner = document.getElementById('loadingSpinner');
+        spinner.classList.remove('d-none');
+
         const img = new Image();
         img.onload = function () {
             currentImage = img;
             drawCanvas();
+            spinner.classList.add('d-none');
+        };
+        img.onerror = function () {
+            spinner.classList.add('d-none');
+            alert('Gagal memuat halaman ' + pageNumber);
         };
         img.src = `/books/${bookId}/page/${pageNumber}`;
         document.getElementById('pageJumpInput').value = pageNumber;
+        updateNavButtons();
     }
 
     function jumpToPage() {
@@ -96,6 +119,12 @@
     document.addEventListener('contextmenu', e => e.preventDefault());
     document.addEventListener('keydown', function (e) {
         if (e.ctrlKey && ['s', 'S', 'p', 'P'].includes(e.key)) e.preventDefault();
+
+        // Navigasi halaman pakai arrow key (kecuali sedang fokus di input)
+        if (document.activeElement.tagName !== 'INPUT') {
+            if (e.key === 'ArrowRight') nextPage();
+            if (e.key === 'ArrowLeft') prevPage();
+        }
     });
 
     renderPage(currentPage);

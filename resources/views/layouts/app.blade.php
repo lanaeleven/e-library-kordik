@@ -16,26 +16,38 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
         <div class="container">
-            <div class="d-flex">
-                <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('dashboard') }}">
-                    <i class="bi bi-book-half"></i> RSISA Library
-                </a>
-                <a class="btn btn-secondary" href="{{ route('book.myBook') }}">Buku Saya</a>
-            </div>
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('dashboard') }}">
+                <i class="bi bi-book-half"></i> RSISA Library
+            </a>
 
-            @auth
-                <div class="d-flex align-items-center gap-3 ms-auto">
-                    <span class="text-light small">
-                        <i class="bi bi-person-circle"></i> {{ auth()->user()->nama }}
-                    </span>
-                    <form action="/logout" method="post" class="m-0">
-                        @csrf
-                        <button type="submit" class="btn btn-outline-light btn-sm">
-                            <i class="bi bi-box-arrow-right"></i> Logout
-                        </button>
-                    </form>
-                </div>
-            @endauth
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navMain">
+                <ul class="navbar-nav me-auto ms-lg-3">
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('book.myBook') ? 'active fw-semibold' : '' }}"
+                        href="{{ route('book.myBook') }}">
+                            <i class="bi bi-journal-bookmark me-1"></i> Buku Saya
+                        </a>
+                    </li>
+                </ul>
+
+                @auth
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="text-light small">
+                            <i class="bi bi-person-circle"></i> {{ auth()->user()->nama }}
+                        </span>
+                        <form action="/logout" method="post" class="m-0">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-light btn-sm">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </button>
+                        </form>
+                    </div>
+                @endauth
+            </div>
         </div>
     </nav>
 
